@@ -18,7 +18,7 @@
                     <select class="form-control" name="idcarrera" required>
                         <option value="">Seleccione una opción</option>
                         {{#each carreras}}
-                            <option value="{{idcarrera}}" {{#ifCond idcarrera ../idcarrera}}selected{{/ifCond}}>{{carrera}}</option>
+                            <option value="{{idcarrera}}" {{#eq idcarrera ../idcarrera}}selected{{/eq}}>{{carrera}}</option>
                         {{/each}}
                     </select>
                 </div>

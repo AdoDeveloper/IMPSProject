@@ -2,46 +2,40 @@ const express = require("express");
 const morgan = require("morgan");
 const exphbs = require("express-handlebars"); // Necesario para utilizar el motor de plantillas handlebars
 const path = require("path");
+
 // Inicializaciones
 const app = express();
-
 require("dotenv").config();
 
 // Ajustes del servidor
-app.set("port", process.env.PORT || 4000);
+app.set("port", process.env.PORT || 4500);
+app.set("views", path.join(__dirname, "views")); // Configuración de la ruta donde se encuentran las vistas
 
-app.set("views", path.join(__dirname, "views")); // Configuracion de la ruta donde se encuentran las vistas
 app.engine(
   ".hbs",
   exphbs.engine({
-    defaultLayout: "main", // Configuracion del layout principal
-    layoutsDir: path.join(app.get("views"), "layouts"), // Configuracion de la ruta de los layouts
-    extname: ".hbs", // Configura la extensión que tendran los archivos HandleBars
-    helpers: {
-        ifCond: function (v1, v2, options) {
-            if (v1 === v2) {
-              return options.fn(this);
-            }
-            return options.inverse(this);
-          }
-    }
+    defaultLayout: "main", // Configuración del layout principal
+    layoutsDir: path.join(app.get("views"), "layouts"), // Configuración de la ruta de los layouts
+    partialsDir: path.join(app.get("views"), "partials"), // Configuración de vistas parciales
+    extname: ".hbs", // Configura la extensión que tendrán los archivos
+    helpers: require("./lib/handlebars"), // Configuración de funciones
   })
 );
+app.set("view engine", ".hbs"); // Configuración para ejecutar el motor de plantillas
 
-app.set("view engine", ".hbs"); // Configuracion para ejecutar el motor de plantillas
-app.use(morgan("dev")); // Configurando el middleware morgan para visualizar que esta llegando al servidor
-app.use(express.urlencoded({ extended: false })); // Sirve para poder aceptar datos desde formularios
+app.use(morgan("dev")); // Configurando el middleware morgan para visualizar qué está llegando al servidor
+app.use(express.urlencoded({ extended: false })); // Permite aceptar datos desde formularios
 
-// Configuracion de rutas
-app.use(require("./routes")); // Node automaticamente busca el index.js del modulo
-app.use("/estudiantes", require("./routes/estudiantes")); // Configuracion de ruta para estudiantes
-app.use('/carreras', require('./routes/carreras'));
+// Configuración de rutas
+app.use(require("./routes")); // Node busca automáticamente el index.js del módulo
+app.use("/estudiantes", require("./routes/estudiantes")); // Configuración de ruta para estudiantes
+app.use("/carreras", require("./routes/carreras")); // Configuración de ruta para carreras
+app.use("/profesores", require("./routes/profesores"));
 
-// Archivos publicos (aca se coloca todo el código al cual el navegador puede acceder)
+// Archivos públicos (aquí se coloca todo el código al que el navegador puede acceder)
 app.use(express.static(path.join(__dirname, "public")));
 
 // Iniciar el servidor
 app.listen(app.get("port"), () => {
   console.log(`Servidor iniciado en el puerto: http://localhost:${app.get("port")}`);
 });
-
