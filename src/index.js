@@ -31,6 +31,7 @@ app.use(require("./routes")); // Node busca automáticamente el index.js del mó
 app.use("/estudiantes", require("./routes/estudiantes")); // Configuración de ruta para estudiantes
 app.use("/carreras", require("./routes/carreras")); // Configuración de ruta para carreras
 app.use("/profesores", require("./routes/profesores"));
+app.use("/materias", require("./routes/materias"));
 
 // Archivos públicos (aquí se coloca todo el código al que el navegador puede acceder)
 app.use(express.static(path.join(__dirname, "public")));
