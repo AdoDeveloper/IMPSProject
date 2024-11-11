@@ -1,51 +1,76 @@
 const express = require('express');
 const router = express.Router();
 const queries = require('../repositories/MateriaRepository');
+const { isLoggedIn } = require('../lib/auth');
 
 // Endpoint para mostrar todas las materias
-router.get('/', async (request, response) => {
+router.get('/', isLoggedIn, async (request, response) => {
+    console.log('Entro aqui');
     const materias = await queries.obtenerTodasLasMaterias();
-    response.render('materias/listado', { materias });
+    console.log('Salio aqui');
+
+    response.render('materias/listado', { materias: materias }); // Mostramos el listado de materias
 });
 
-// Endpoint para mostrar el formulario para agregar una nueva materia
-router.get('/agregar', (request, response) => {
+// Endpoint que permite mostrar el formulario para agregar una nueva materia
+router.get('/agregar', isLoggedIn, async (request, response) => {
     response.render('materias/agregar');
 });
 
-// Endpoint para agregar una nueva materia
-router.post('/agregar', async (request, response) => {
-    const { materia } = request.body;
-    const resultado = await queries.agregarMateria({ materia });
+// Endpoint para agregar una materia
+router.post('/agregar', isLoggedIn, async (request, response) => {
+    const { idmateria, materia } = request.body;
+    const nuevaMateria = { idmateria, materia };
+
+    const resultado = await queries.insertarMateria(nuevaMateria);
+
     if (resultado) {
-        response.redirect('/materias');
+        request.flash('success', 'Registro insertado con éxito');
     } else {
-        response.redirect('/materias/agregar');
+        request.flash('error', 'Ocurrió un problema al guardar el registro');
     }
-});
-
-// Endpoint para mostrar el formulario de modificar una materia
-router.get('/modificar/:idmateria', async (request, response) => {
-    const { idmateria } = request.params;
-    const materia = await queries.obtenerMateriaPorId(idmateria);
-    response.render('materias/modificar', { idmateria, materia: materia.materia });
-});
-
-// Endpoint para modificar una materia
-router.post('/modificar/:idmateria', async (request, response) => {
-    const { idmateria } = request.params;
-    const { materia } = request.body;
-    await queries.actualizarMateria(idmateria, { materia });
     response.redirect('/materias');
 });
 
-// Endpoint para eliminar una materia
-router.get('/eliminar/:idmateria', async (request, response) => {
+// Endpoint para mostrar el formulario de modificación
+router.get('/modificar/:idmateria', isLoggedIn, async (request, response) => {
     const { idmateria } = request.params;
-    const resultado = await queries.eliminarMateria(idmateria);
-    if (resultado) {
+    const materia = await queries.obtenerMateriaPorid(idmateria);
+
+    if (materia) {
+        response.render('materias/modificar', { idmateria, materia });
+    } else {
         response.redirect('/materias');
     }
+});
+
+// Endpoint que permite modificar una materia
+router.post('/modificar/:id', isLoggedIn, async (request, response) => {
+    const { id } = request.params;
+    const { idmateria, materia } = request.body;
+    const datosModificados = { idmateria, materia };
+
+    const resultado = await queries.actualizarMateria(id, datosModificados);
+
+    if (resultado) {
+        request.flash('success', 'Registro actualizado con éxito');
+    } else {
+        request.flash('error', 'Ocurrió un problema al actualizar el registro');
+    }
+    response.redirect('/materias');
+});
+
+// Endpoint que permite eliminar una materia
+router.get('/eliminar/:idmateria', isLoggedIn, async (request, response) => {
+    const { idmateria } = request.params;
+    const resultado = await queries.eliminarMateria(idmateria);
+
+    if (resultado > 0) {
+        request.flash('success', 'Registro eliminado con éxito');
+    } else {
+        request.flash('error', 'Ocurrió un problema al eliminar el registro');
+    }
+    response.redirect('/materias');
 });
 
 module.exports = router;

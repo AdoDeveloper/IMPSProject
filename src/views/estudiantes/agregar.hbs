@@ -1,35 +1,41 @@
 <div class="container p-4">
     <div class="row justify-content-center">
-        <h1>Agregar estudiante</h1>
+        <h1 class="text-center text-primary">Agregar Estudiante</h1>
     </div>
     <div class="row justify-content-center mt-4">
-        <div class="col-md-4">
-            <form method="POST" action="/estudiantes/agregar">
+        <div class="col-md-6">
+            <form action="/estudiantes/agregar" method="POST" class="p-4 border rounded shadow-sm bg-light">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="idestudiante" placeholder="Codigo del estudiante" required autofocus />
+                    <label for="idestudiante" class="font-weight-bold">Código del Estudiante</label>
+                    <input type="text" id="idestudiante" class="form-control" name="idestudiante" placeholder="Ej: ABC123" autofocus required />
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="nombre" placeholder="Nombre del estudiante" required autofocus />
+                    <label for="nombre" class="font-weight-bold">Nombre</label>
+                    <input type="text" id="nombre" class="form-control" name="nombre" placeholder="Nombre del estudiante" required />
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="apellido" placeholder="Apellido del estudiante" required />
+                    <label for="apellido" class="font-weight-bold">Apellido</label>
+                    <input type="text" id="apellido" class="form-control" name="apellido" placeholder="Apellido del estudiante" required />
                 </div>
                 <div class="form-group">
-                    <input type="email" class="form-control" name="email" placeholder="Correo del estudiante" required />
+                    <label for="email" class="font-weight-bold">Correo Electrónico</label>
+                    <input type="email" id="email" class="form-control" name="email" placeholder="Correo del estudiante" required />
                 </div>
                 <div class="form-group">
-                    <select class="form-control" name="idcarrera" required>
-                        <option value="">Seleccione una opción</option>
-                        {{#each carreras}}
-                            <option value="{{idcarrera}}">{{carrera}}</option>
+                    <label for="idcarrera" class="font-weight-bold">Carrera</label>
+                    <select id="idcarrera" class="form-control" name="idcarrera" required>
+                        <option value="" selected disabled>Seleccione una carrera</option>
+                        {{#each lstCarreras}}
+                        <option value="{{idcarrera}}">{{carrera}}</option>
                         {{/each}}
                     </select>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="usuario" placeholder="Usuario del estudiante" required />
+                    <label for="usuario" class="font-weight-bold">Usuario</label>
+                    <input type="text" id="usuario" class="form-control" name="usuario" placeholder="Usuario del estudiante" required />
                 </div>
-                <div class="form-group">
-                    <button class="btn btn-success btn-block">Guardar</button>
+                <div class="form-group text-center">
+                    <button class="btn btn-primary btn-block">Guardar</button>
                 </div>
             </form>
         </div>

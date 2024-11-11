@@ -1,82 +1,76 @@
 const express = require('express');
 const router = express.Router();
 const queries = require('../repositories/EstudianteRepository');
+const carrerasQuery = require('../repositories/CarreraRepository');
+const { isLoggedIn } = require('../lib/auth');
+
 // Endpoint para mostrar todos los estudiantes
-router.get('/', async (request, response) => {
+router.get('/', isLoggedIn, async (request, response) => {
     const estudiantes = await queries.obtenerTodosLosEstudiantes();
-    response.render('estudiantes/listado', { estudiantes }); // Mostramos ellistado de estudiantes
+    response.render('estudiantes/listado', { estudiantes }); // Mostramos el listado de estudiantes
 });
+
 // Endpoint que permite mostrar el formulario para agregar un nuevo estudiante
-router.get('/agregar', async (request, response) => {
-    const carreras = await queries.obtenerTodasLasCarreras();
-    response.render('estudiantes/agregar', { carreras });
+router.get('/agregar', isLoggedIn, async (request, response) => {
+    const lstCarreras = await carrerasQuery.obtenerTodasLasCarreras();
+    // Renderizamos el formulario
+    response.render('estudiantes/agregar', { lstCarreras });
 });
 
 // Endpoint para agregar un estudiante
-router.post('/agregar', async (request, response) => {
+router.post('/agregar', isLoggedIn, async (request, response) => {
     const { idestudiante, nombre, apellido, email, idcarrera, usuario } = request.body;
-    const estudiante = { idestudiante, nombre, apellido, email, idcarrera, usuario };
-    const resultado = await queries.agregarEstudiante(estudiante);
+    const nuevoEstudiante = { idestudiante, nombre, apellido, email, idcarrera, usuario };
+    const resultado = await queries.insertarEstudiante(nuevoEstudiante);
+
     if (resultado) {
-        console.log('Estudiante agregado exitosamente');
-        response.redirect('/estudiantes');
+        request.flash('success', 'Registro insertado con éxito');
     } else {
-        console.log('Error al agregar el estudiante');
-        response.redirect('/estudiantes/agregar');
-    }
-});
-
-router.get('/modificar/:idestudiante', async (request, response) => {
-    try {
-        const { idestudiante } = request.params;
-        const estudiante = await queries.obtenerEstudiantePorId(idestudiante);
-        const carreras = await queries.obtenerTodasLasCarreras();
-
-        if (estudiante) {
-            response.render('estudiantes/modificar', {
-                idestudiante: estudiante.idestudiante,
-                nombre: estudiante.nombre,
-                apellido: estudiante.apellido,
-                email: estudiante.email,
-                idcarrera: estudiante.idcarrera,
-                usuario: estudiante.usuario,
-                carreras
-            });
-        } else {
-            response.redirect('/estudiantes');
-        }
-    } catch (error) {
-        console.error('Error al obtener el estudiante o las carreras: ', error);
-        response.redirect('/estudiantes');
-    }
-});
-
-
-
-router.post('/modificar/:idestudiante', async (request, response) => {
-    try {
-        const { idestudiante } = request.params;
-        const { nombre, apellido, email, idcarrera, usuario } = request.body;
-
-        // Lógica para actualizar el estudiante en la base de datos
-        await queries.actualizarEstudiante(idestudiante, { nombre, apellido, email, idcarrera, usuario });
-
-        // Redireccionar después de la actualización
-        response.redirect('/estudiantes');
-    } catch (error) {
-        console.error('Error al actualizar el estudiante:', error);
-        response.redirect('/estudiantes');
-    }
-});
-
-// Endpoint que permite eliminar un estudiante
-router.get('/eliminar/:idestudiante', async (request, response) => {
-    // Desestructuramos el objeto que nos mandan en la peticion y extraemos el idestudiante
-    const { idestudiante } = request.params;
-    const resultado = await queries.eliminarEstudiante(idestudiante);
-    if (resultado > 0) {
-        console.log('Eliminado con éxito');
+        request.flash('error', 'Ocurrió un problema al guardar el registro');
     }
     response.redirect('/estudiantes');
 });
+
+// Endpoint para mostrar el formulario de modificación
+router.get('/modificar/:idestudiante', isLoggedIn, async (request, response) => {
+    const { idestudiante } = request.params;
+    const estudiante = await queries.obtenerEstudiantePorid(idestudiante);
+
+    if (estudiante) {
+        const lstCarreras = await carrerasQuery.obtenerTodasLasCarreras();
+        response.render('estudiantes/modificar', { lstCarreras, idestudiante, estudiante });
+    } else {
+        response.redirect('/estudiantes');
+    }
+});
+
+// Endpoint que permite modificar un estudiante
+router.post('/modificar/:id', isLoggedIn, async (request, response) => {
+    const { id } = request.params;
+    const { idestudiante, nombre, apellido, email, idcarrera, usuario } = request.body;
+    const datosModificados = { idestudiante, nombre, apellido, email, idcarrera, usuario };
+
+    const resultado = await queries.actualizarEstudiante(id, datosModificados);
+
+    if (resultado) {
+        request.flash('success', 'Registro actualizado con éxito');
+    } else {
+        request.flash('error', 'Ocurrió un problema al actualizar el registro');
+    }
+
+    response.redirect('/estudiantes');
+});
+
+// Endpoint que permite eliminar un estudiante
+router.get('/eliminar/:idestudiante', isLoggedIn, async (request, response) => {
+    const { idestudiante } = request.params;
+    const resultado = await queries.eliminarEstudiante(idestudiante);
+    if (resultado > 0) {
+        request.flash('success', 'Registro eliminado con éxito');
+    } else {
+        request.flash('error', 'Ocurrió un problema al eliminar el registro');
+    }
+    response.redirect('/estudiantes');
+});
+
 module.exports = router;

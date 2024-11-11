@@ -1,82 +1,73 @@
 const express = require('express');
 const router = express.Router();
-const carreraQueries = require('../repositories/CarreraRepository');
+const queries = require('../repositories/CarreraRepository');
+const { isLoggedIn } = require('../lib/auth');
 
-// Listar todas las carreras
-router.get('/', async (request, response) => {
-    try {
-        const carreras = await carreraQueries.obtenerTodasLasCarreras();
-        response.render('carreras/listado', { carreras });
-    } catch (error) {
-        console.error('Error al obtener las carreras:', error);
-        response.redirect('/');
-    }
+// Endpoint para mostrar todas las carreras 
+router.get('/', isLoggedIn, async (request, response) => {
+   const carreras = await queries.obtenerTodasLasCarreras();
+   response.render('carreras/listado', { carreras: carreras }); // Mostramos el listado de carreras
 });
 
-// Mostrar el formulario para agregar una nueva carrera
-router.get('/agregar', (request, response) => {
-    response.render('carreras/agregar');
+// Endpoint que permite mostrar el formulario para agregar una nueva carrera
+router.get('/agregar', isLoggedIn, async (request, response) => {
+   response.render('carreras/agregar');
 });
 
-// Agregar una nueva carrera
-router.post('/agregar', async (request, response) => {
-    try {
-        const { idcarrera, carrera } = request.body;
-        const resultado = await carreraQueries.agregarCarrera({ idcarrera, carrera });
-        if (resultado) {
-            response.redirect('/carreras');
-        } else {
-            response.render('carreras/agregar', { error: 'No se pudo agregar la carrera' });
-        }
-    } catch (error) {
-        console.error('Error al agregar la carrera:', error);
-        response.render('carreras/agregar', { error: 'Ocurrió un error' });
-    }
+// Endpoint para agregar una carrera
+router.post('/agregar', isLoggedIn, async (request, response) => {
+  const { idcarrera, carrera } = request.body;
+  const nuevaCarrera = { idcarrera, carrera };
+
+  const resultado = await queries.insertarCarrera(nuevaCarrera);
+
+  if (resultado) {
+      request.flash('success', 'Registro insertado con éxito');
+  } else {
+      request.flash('error', 'Ocurrió un problema al guardar el registro');
+  }
+
+  response.redirect('/carreras');
 });
 
-// Mostrar el formulario para modificar una carrera existente
-router.get('/modificar/:idcarrera', async (request, response) => {
-    try {
-        const { idcarrera } = request.params;
-        const carrera = await carreraQueries.obtenerCarreraPorId(idcarrera);
-        response.render('carreras/modificar', { carrera });
-    } catch (error) {
-        console.error('Error al obtener la carrera:', error);
-        response.redirect('/carreras');
-    }
+// Endpoint para mostrar el formulario de modificación
+router.get('/modificar/:idcarrera', isLoggedIn, async (request, response) => {
+   const { idcarrera } = request.params;
+   const carrera = await queries.obtenerCarreraPorid(idcarrera);
+
+   if (carrera) {
+      response.render('carreras/modificar', { idcarrera, carrera });
+   } else {
+      response.redirect('/carreras');
+   }
 });
 
-// Modificar una carrera existente
-router.post('/modificar/:idcarrera', async (request, response) => {
-    try {
-        const { idcarrera } = request.params;
-        const { carrera } = request.body;
-        const resultado = await carreraQueries.actualizarCarrera(idcarrera, { carrera });
-        if (resultado) {
-            response.redirect('/carreras');
-        } else {
-            response.render('carreras/modificar', { error: 'No se pudo actualizar la carrera', carrera });
-        }
-    } catch (error) {
-        console.error('Error al actualizar la carrera:', error);
-        response.redirect('/carreras');
-    }
+// Endpoint que permite modificar una carrera
+router.post('/modificar/:id', isLoggedIn, async (request, response) => {
+   const { id } = request.params;
+   const { idcarrera, carrera } = request.body;
+   const datosModificados = { idcarrera, carrera };
+
+   const resultado = await queries.actualizarCarrera(id, datosModificados);
+
+   if (resultado) {
+      request.flash('success', 'Registro actualizado con éxito');
+   } else {
+      request.flash('error', 'Ocurrió un problema al actualizar el registro');
+   }
+   response.redirect('/carreras');
 });
 
-// Eliminar una carrera
-router.get('/eliminar/:idcarrera', async (request, response) => {
-    try {
-        const { idcarrera } = request.params;
-        const resultado = await carreraQueries.eliminarCarrera(idcarrera);
-        if (resultado) {
-            response.redirect('/carreras');
-        } else {
-            response.redirect('/carreras');
-        }
-    } catch (error) {
-        console.error('Error al eliminar la carrera:', error);
-        response.redirect('/carreras');
-    }
+// Endpoint que permite eliminar una carrera
+router.get('/eliminar/:idcarrera', isLoggedIn, async (request, response) => {
+   const { idcarrera } = request.params;
+   const resultado = await queries.eliminarCarrera(idcarrera);
+   if (resultado > 0) {
+      request.flash('success', 'Eliminación correcta');
+   } else {
+      request.flash('error', 'Error al eliminar');
+   }
+   response.redirect('/carreras');
 });
 
 module.exports = router;

@@ -2,27 +2,25 @@ const helpers = require('handlebars');
 
 // Este helper nos permite comparar 2 valores en la plantilla handlebars
 helpers.registerHelper('eq', function (a, b, options) {
-    return a === b ? options.fn(this) : options.inverse(this);
+      return a === b ? options.fn(this) : options.inverse(this); // Utilizamos un if ternario
 });
 
-// Helper para formatear fechas en formato dd/mm/aaaa
+// Helper para formato de la fecha
+
+
 helpers.registerHelper('formatDate', function (date) {
-    if (!date) return '';
-    const d = new Date(date);
-    const day = (`0${d.getDate()}`).slice(-2);
-    const month = (`0${d.getMonth() + 1}`).slice(-2); // Los meses en JavaScript son de 0 a 11
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(date).toLocaleDateString(undefined, options);
 });
 
-// Helper para formatear fechas en formato aaaa-mm-dd para inputs de tipo date
-helpers.registerHelper('formatDateForInput', function (date) {
-    if (!date) return '';
+// Helper para formatear la fecha en formato 'YYYY-MM-DD'
+helpers.registerHelper('formatDateEdit', function (date) {
+    if (!date) return ''; // Si no hay fecha, devolver vacío
     const d = new Date(date);
-    const day = (`0${d.getDate()}`).slice(-2);
-    const month = (`0${d.getMonth() + 1}`).slice(-2); // Los meses en JavaScript son de 0 a 11
     const year = d.getFullYear();
-    return `${year}-${month}-${day}`;
-});
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Mes en dos dígitos
+    const day = String(d.getDate()).padStart(2, '0'); // Día en dos dígitos
+    return `${year}-${month}-${day}`; // Formato compatible con el input de tipo date
+  });
 
 module.exports = helpers;

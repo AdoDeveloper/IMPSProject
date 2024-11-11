@@ -1,25 +1,58 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/estudiantes">IMPS</a>
+                <!-- Brand with Logo and Text -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/img/logo_uso.jpg" alt="Logo IMPS" class="me-2 mr-2" style="width: 20px; height: 20px;">
+            <span>IMPS</span>
+        </a>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/estudiantes">Estudiantes <span class="sr-only">(current)</span></a>
+                {{#if user}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" ariaexpanded="false">
+                        Mantenimientos
+                    </a>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/estudiantes">
+                            <i class="fas fa-user-graduate me-2 text-primary mr-2"></i>Estudiantes
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/carreras">
+                            <i class="fas fa-briefcase me-2 text-warning mr-2"></i>Carreras
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/materias">
+                            <i class="fas fa-book-open me-2 text-success mr-2"></i>Materias
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/profesores">
+                            <i class="fas fa-chalkboard-teacher me-2 text-info mr-2"></i>Profesores
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/grupos">
+                            <i class="fas fa-users me-2 text-danger mr-2"></i>Grupos
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/usuarios">
+                            <i class="fas fa-user-cog me-2 text-secondary mr-2"></i>Usuarios
+                        </a>
+                    </div>
                 </li>
+                <!-- Logout Button -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/carreras">Carreras</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/profesores">Profesores</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/materias">Materias</a>
+                    <a href="/logout" class="nav-link fw-bold text-white">
+                        <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                    </a>
                 </li>
             </ul>
+            {{/if}}
         </div>
     </div>
 </nav>

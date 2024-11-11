@@ -1,0 +1,26 @@
+<div class="container p-4">
+    <div class="row justify-content-center">
+        <h1 class="text-center text-info">Modificar Usuario</h1>
+    </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <form action="/usuarios/modificar/{{usuario.id}}" method="POST" class="p-4 border rounded shadow-sm bg-light">
+                <div class="form-group">
+                    <label for="user_name" class="font-weight-bold">Nombre</label>
+                    <input type="text" id="user_name" class="form-control" name="user_name" value="{{usuario.user_name}}" required />
+                </div>
+                <div class="form-group">
+                    <label for="user_email" class="font-weight-bold">Correo</label>
+                    <input type="email" id="user_email" class="form-control" name="user_email" value="{{usuario.user_email}}" required />
+                </div>
+                <div class="form-group">
+                    <label for="user_password" class="font-weight-bold">Nueva Contraseña (Opcional)</label>
+                    <input type="password" id="user_password" class="form-control" name="user_password" />
+                </div>
+                <div class="form-group text-center">
+                    <button class="btn btn-info btn-block">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

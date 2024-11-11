@@ -1,53 +1,60 @@
-const pool = require("../config/databaseController");
+const pool = require('../config/databaseController');
 
 module.exports = {
-    // Obtener todas las materias
-    obtenerTodasLasMaterias: async () => {
+    
+    //Consulta para obtener todas las materias
+
+    obtenerTodasLasMaterias: async() => {
+        console.log('Hizo la consulta');
         try {
-            const result = await pool.query("SELECT * FROM materias");
+            const result = await pool.query('SELECT * FROM materias');
             return result;
+            
         } catch (error) {
-            console.error("Error al obtener las materias: ", error);
+            console.error('ocurrio un problema al consultar la lista de materias', error)
         }
     },
 
-    // Agregar una nueva materia
-    agregarMateria: async (materia) => {
+     // Insertar materia
+     insertarMateria: async(nuevaMateria) =>{
         try {
-            const result = await pool.query("INSERT INTO materias (materia) VALUES (?)", [materia.materia]);
+            const result = await pool.query('INSERT INTO materias SET ?', nuevaMateria);
+            return result.affectedRows > 0;
+            
+        } catch (error) {
+            console.error('Ocurrio un problema al insertar la materia',error)
+        }
+    },
+
+     //Actualizar materia
+     actualizarMateria: async(idmateria,datosModificados) =>{
+        try {
+            const result = await pool.query(' UPDATE materias SET ?  WHERE idmateria = ?', [datosModificados,idmateria]);
+            return result.affectedRows > 0;
+            
+        } catch (error) {
+            console.log('Error al actualizar los datos',error);
+        }
+    },
+     //Obtener materia por id
+     obtenerMateriaPorid: async(idmateria) => {
+        try {
+            const [materia]= await pool.query('SELECT * FROM materias WHERE idmateria = ?',[idmateria]);
+            return materia;
+            
+        } catch (error) {
+            console.log('Error al obtener materia');
+        }
+    },
+
+    // Eliminar materia
+    eliminarMateria: async(idmateria) => {
+        try {
+            const result = await pool.query('DELETE FROM materias WHERE idmateria = ?', [idmateria])
             return result.affectedRows > 0;
         } catch (error) {
-            console.error("Error al agregar la materia: ", error);
-        }
-    },
-
-    // Obtener una materia por su ID
-    obtenerMateriaPorId: async (idmateria) => {
-        try {
-            const result = await pool.query("SELECT * FROM materias WHERE idmateria = ?", [idmateria]);
-            return result[0];
-        } catch (error) {
-            console.error("Error al obtener la materia: ", error);
-        }
-    },
-
-    // Actualizar una materia
-    actualizarMateria: async (idmateria, materia) => {
-        try {
-            const result = await pool.query("UPDATE materias SET materia = ? WHERE idmateria = ?", [materia.materia, idmateria]);
-            return result.affectedRows > 0;
-        } catch (error) {
-            console.error("Error al actualizar la materia: ", error);
-        }
-    },
-
-    // Eliminar una materia
-    eliminarMateria: async (idmateria) => {
-        try {
-            const result = await pool.query("DELETE FROM materias WHERE idmateria = ?", [idmateria]);
-            return result.affectedRows > 0;
-        } catch (error) {
-            console.error("Error al eliminar la materia: ", error);
+            console.error('Error al eliminara materia', error);
         }
     }
-};
+
+}
