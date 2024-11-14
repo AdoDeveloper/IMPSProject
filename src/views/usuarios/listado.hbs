@@ -13,7 +13,6 @@
             <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
                         <th>Opciones</th>
@@ -22,12 +21,16 @@
                 <tbody>
                     {{#each usuarios}}
                     <tr>
-                        <td>{{id}}</td>
                         <td>{{user_name}}</td>
                         <td>{{user_email}}</td>
                         <td>
-                            <a href="/usuarios/modificar/{{id}}" class="btn btn-primary btn-sm">Modificar</a>
-                            <a href="/usuarios/eliminar/{{id}}" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a href="/usuarios/modificar/{{id}}" class="btn btn-primary btn">Modificar</a>
+                            <button class="btn btn-danger btn btn-eliminar" 
+                                    data-id="{{id}}" 
+                                    data-nombre="{{user_name}}" 
+                                    data-email="{{user_email}}">
+                                Eliminar
+                            </button>
                         </td>
                     </tr>
                     {{/each}}
@@ -36,3 +39,54 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Esperar a que el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function () {
+        // Agregar evento a todos los botones de eliminar
+        const deleteButtons = document.querySelectorAll(".btn-eliminar");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault(); // Evitar la acción predeterminada
+
+                const idUsuario = this.getAttribute("data-id");
+                const nombreUsuario = this.getAttribute("data-nombre");
+                const emailUsuario = this.getAttribute("data-email");
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: `
+                        <p>Estás a punto de eliminar al usuario:
+                        <strong>${nombreUsuario}</strong><br>
+                        <strong>Email: ${emailUsuario}</strong></p>
+                        <p class="text-danger">Esta acción no se puede revertir.</p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar un indicador de carga
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            text: 'Por favor espera.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => Swal.showLoading(),
+                        });
+
+                        // Simular la redirección o llamada al servidor
+                        setTimeout(() => {
+                            // Redireccionar a la ruta de eliminación
+                            window.location.href = `/usuarios/eliminar/${idUsuario}`;
+                        }, 2000); // Simulación de tiempo de espera
+                    }
+                });
+            });
+        });
+    });
+</script>

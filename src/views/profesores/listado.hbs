@@ -13,12 +13,9 @@
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">ID</th>
                     <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
                     <th scope="col">Fecha de Nacimiento</th>
                     <th scope="col">Profesión</th>
-                    <th scope="col">Género</th>
                     <th scope="col">Email</th>
                     <th scope="col">Opciones</th>
                 </tr>
@@ -26,16 +23,18 @@
             <tbody>
                 {{#each profesores}}
                 <tr>
-                    <th scope="row">{{idprofesor}}</th>
-                    <td>{{nombre}}</td>
-                    <td>{{apellido}}</td>
+                    <td>{{nombre}} {{apellido}}</td>
                     <td>{{formatDate fecha_nacimiento}}</td>
                     <td>{{profesion}}</td>
-                    <td>{{genero}}</td>
                     <td>{{email}}</td>
                     <td>
                         <a href="/profesores/modificar/{{idprofesor}}" class="btn btn-primary text-white">Modificar</a>
-                        <a href="/profesores/eliminar/{{idprofesor}}" class="btn btn-danger text-white">Eliminar</a>
+                        <button class="btn btn-danger text-white btn-eliminar" 
+                                data-id="{{idprofesor}}" 
+                                data-nombre="{{nombre}}" 
+                                data-apellido="{{apellido}}">
+                            Eliminar
+                        </button>
                     </td>
                 </tr>
                 {{/each}}
@@ -43,3 +42,53 @@
         </table>
     </div>
 </div>
+
+<script>
+    // Esperar a que el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function () {
+        // Agregar evento a todos los botones de eliminar
+        const deleteButtons = document.querySelectorAll(".btn-eliminar");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault(); // Evitar la acción predeterminada
+
+                const idProfesor = this.getAttribute("data-id");
+                const nombreProfesor = this.getAttribute("data-nombre");
+                const apellidoProfesor = this.getAttribute("data-apellido");
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: `
+                        <p>Estás a punto de eliminar al profesor:
+                        <strong>${nombreProfesor} ${apellidoProfesor}</strong></p>
+                        <p class="text-danger">Esta acción no se puede revertir.</p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar un indicador de carga
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            text: 'Por favor espera.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => Swal.showLoading(),
+                        });
+
+                        // Simular la redirección o llamada al servidor
+                        setTimeout(() => {
+                            // Redireccionar a la ruta de eliminación
+                            window.location.href = `/profesores/eliminar/${idProfesor}`;
+                        }, 2000); // Simulación de tiempo de espera
+                    }
+                });
+            });
+        });
+    });
+</script>

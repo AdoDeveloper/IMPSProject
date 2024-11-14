@@ -16,7 +16,6 @@
                     <th scope="col">Codigo</th>
                     <th scope="col">Materia</th>
                     <th scope="col">Opciones</th>
-                    
                 </tr>
             </thead>
             <tbody>
@@ -26,7 +25,11 @@
                     <td>{{materia}}</td>
                     <td>
                         <a href="/materias/modificar/{{idmateria}}" class="btn btn-primary text-white">Modificar</a>
-                        <a href="/materias/eliminar/{{idmateria}}" class="btn  btn-danger text-white">Eliminar</a>
+                        <button class="btn btn-danger text-white btn-eliminar" 
+                                data-id="{{idmateria}}" 
+                                data-materia="{{materia}}">
+                            Eliminar
+                        </button>
                     </td>
                 </tr>
                 {{/each}}
@@ -34,3 +37,52 @@
         </table>
     </div>
 </div>
+
+<script>
+    // Esperar a que el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function () {
+        // Agregar evento a todos los botones de eliminar
+        const deleteButtons = document.querySelectorAll(".btn-eliminar");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault(); // Evitar la acción predeterminada
+
+                const idMateria = this.getAttribute("data-id");
+                const nombreMateria = this.getAttribute("data-materia");
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: `
+                        <p>Estás a punto de eliminar la materia:
+                        <strong>${nombreMateria}</strong></p>
+                        <p class="text-danger">Esta acción no se puede revertir.</p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar un indicador de carga
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            text: 'Por favor espera.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => Swal.showLoading(),
+                        });
+
+                        // Simular la redirección o llamada al servidor
+                        setTimeout(() => {
+                            // Redireccionar a la ruta de eliminación
+                            window.location.href = `/materias/eliminar/${idMateria}`;
+                        }, 2000); // Simulación de tiempo de espera
+                    }
+                });
+            });
+        });
+    });
+</script>

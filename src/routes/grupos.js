@@ -3,7 +3,6 @@ const router = express.Router();
 const queries = require('../repositories/GrupoRepository');
 const materiasQuery = require('../repositories/MateriaRepository');
 const profesoresQuery = require('../repositories/ProfesorRepository');
-const carrerasQuery = require('../repositories/CarreraRepository');
 const estudiantesQuery = require('../repositories/EstudianteRepository');
 const { isLoggedIn } = require('../lib/auth');
 
@@ -72,9 +71,11 @@ router.post('/modificar/:id', isLoggedIn, async (request, response) => {
 
   if (resultado) {
     console.log('Modificado con exito');
+    request.flash('success', 'Registro actualizado con éxito');
     response.redirect('/grupos');
   } else {
     console.log('Error al modificar ');
+    request.flash('error', 'Ocurrió un problema al actualizar el registro');
     response.redirect('/grupos');
   }
 });
